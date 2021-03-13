@@ -1,4 +1,4 @@
-package UserPath
+package cmd
 
 type UserPath struct {
 	workshop_dir string

@@ -19,8 +19,6 @@ import (
 	"fmt"
 	"os"
 
-	"rim_mod_translate_downloader_go_edition/internal/UserPath"
-
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +32,7 @@ var rootCmd = &cobra.Command{
 
 		if len(args) > 0 {
 			url := args[0]
-			userpath := &UserPath.UserPath{url}
+			userpath := &UserPath{url}
 		} else {
 			cmd.Println("No input url!") // stderrに出る
 		}
