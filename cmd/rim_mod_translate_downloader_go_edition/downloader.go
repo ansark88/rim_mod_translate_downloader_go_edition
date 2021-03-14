@@ -8,16 +8,17 @@ import (
 // Downloader のDL処理に使う情報
 type Downloader struct {
 	userPath *UserPath
-	url      string
+	url      URL
 	destPath FilePath
 }
 
 // NewDownloader はDownloader構造体のコンストラクタ
-func NewDownloader(userPath *UserPath, url string) *Downloader {
-	return &Downloader{userPath, url, FilePath{}}
+func NewDownloader(userPath *UserPath, url URL) *Downloader {
+	return &Downloader{userPath, url, NewFilePathEmpty()}
 }
 
-func (d Downloader) fetch(url string, id string) error {
+func (d Downloader) fetch(url URL, id string) error {
+	// Todo: 未実装
 	return nil
 }
 
@@ -26,7 +27,7 @@ func (d Downloader) download() (FilePath, error) {
 
 	u, err := URLParse(parseURL)
 	if err != nil {
-		return FilePath{}, err
+		return NewFilePathEmpty(), err
 	}
 
 	fetchURL := u.convertedURL
@@ -36,7 +37,7 @@ func (d Downloader) download() (FilePath, error) {
 	err = d.fetch(fetchURL, id)
 
 	if err != nil {
-		return FilePath{}, err
+		return NewFilePathEmpty(), err
 	}
 
 	return d.destPath, nil

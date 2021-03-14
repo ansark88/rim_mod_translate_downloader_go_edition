@@ -18,18 +18,22 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		if len(args) > 0 {
-			url := args[0]
+			url, err := NewURL(args[0])
+
+			if err != nil {
+				cmd.Println("Invalid URL!!!", err)
+			}
 
 			// ダウンロード処理
 			userpath := NewUserPath()
 			downloader := NewDownloader(userpath, url)
-			_, err := downloader.download()
+			_, err = downloader.download()
 			if err != nil {
 				cmd.Println("Download Error!!!", err)
 			}
 
 		} else {
-			cmd.Println("No input url!") // stderrに出る
+			cmd.Println("No input URL!!!") // stderrに出る
 		}
 	},
 }

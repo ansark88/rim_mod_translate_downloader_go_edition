@@ -16,10 +16,10 @@ type UserPath struct {
 // NewUserPath はUserPath構造体のコンストラクタ
 func NewUserPath() *UserPath {
 	workshopDir := decideWorkshopDir()
-	return &UserPath{FilePath{workshopDir}}
+	return &UserPath{workshopDir}
 }
 
-func decideWorkshopDir() string {
+func decideWorkshopDir() FilePath {
 	var path string
 
 	homeDir, err := os.UserHomeDir()
@@ -38,5 +38,5 @@ func decideWorkshopDir() string {
 
 	fmt.Println("workshopDir:", path)
 
-	return path
+	return FilePath(path)
 }
