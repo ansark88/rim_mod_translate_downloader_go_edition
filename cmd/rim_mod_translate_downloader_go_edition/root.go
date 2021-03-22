@@ -5,6 +5,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -27,11 +28,24 @@ var rootCmd = &cobra.Command{
 			// ダウンロード処理
 			userpath := NewUserPath()
 			downloader := NewDownloader(userpath, url)
-			_, err = downloader.download()
+			err = downloader.download()
 			if err != nil {
 				cmd.Println("Download Error!!!", err)
 			}
 
+			// 解凍処理
+			destDir, err := NewFilePath(filepath.Dir(downloader.destPath.String()))
+			if err != nil {
+				cmd.Println("Dest Directory Error!!!", err)
+			}
+
+			var archiver Archiver = NewZipArchiver(downloader.destPath, destDir)
+
+			if err := archiver.extract(); err != nil {
+				cmd.Println("Decompress Error!!!", err)
+			} else {
+				fmt.Println("Complete!!!")
+			}
 		} else {
 			cmd.Println("No input URL!!!") // stderrに出る
 		}

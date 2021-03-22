@@ -47,12 +47,12 @@ func (d Downloader) copy(reader io.ReadCloser) error {
 	return err
 }
 
-func (d Downloader) download() (FilePath, error) {
+func (d *Downloader) download() error {
 	parseURL := d.url
 
 	u, err := URLParse(parseURL)
 	if err != nil {
-		return NewFilePathEmpty(), err
+		return err
 	}
 
 	fetchURL := u.convertedURL
@@ -60,13 +60,13 @@ func (d Downloader) download() (FilePath, error) {
 
 	d.destPath, err = d.userPath.workshopDir.join(u.id, "download.zip")
 	if err != nil {
-		return NewFilePathEmpty(), err
+		return err
 	}
 
 	err = d.fetch(fetchURL)
 	if err != nil {
-		return NewFilePathEmpty(), err
+		return err
 	}
 
-	return d.destPath, nil
+	return nil
 }

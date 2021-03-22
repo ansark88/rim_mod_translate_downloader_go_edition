@@ -1,7 +1,7 @@
 // Package cmd はツールの実際の処理が含まれる
 package cmd
 
-import "strings"
+import "path/filepath"
 
 // FilePath はファイルパスを表す型
 type FilePath string
@@ -20,7 +20,7 @@ func NewFilePathEmpty() FilePath {
 func (f FilePath) join(s ...string) (FilePath, error) {
 	slicePath := append([]string{string(f)}, s...)
 
-	joinPath := strings.Join(slicePath, "")
+	joinPath := filepath.Join(slicePath...)
 
 	finalPath, err := NewFilePath(joinPath)
 	if err != nil {
@@ -28,4 +28,8 @@ func (f FilePath) join(s ...string) (FilePath, error) {
 	}
 
 	return finalPath, nil
+}
+
+func (f FilePath) String() string {
+	return string(f)
 }
