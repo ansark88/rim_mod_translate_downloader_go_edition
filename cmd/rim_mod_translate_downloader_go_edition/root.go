@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/spf13/cobra"
 )
+
+var wg sync.WaitGroup
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -17,39 +20,52 @@ var rootCmd = &cobra.Command{
 	Long:  "Download the Japanese translation patch for the Rimworld Mod to the appropriate filepath",
 
 	Run: func(cmd *cobra.Command, args []string) {
+		lenarg := len(args)
 
-		if len(args) > 0 {
-			url, err := NewURL(args[0])
-
-			if err != nil {
-				cmd.Println("Invalid URL!!!", err)
+		// TODO: 複数URL対応をしたい
+		if lenarg > 0 {
+			for i := 0; i < lenarg; i++ {
+				wg.Add(1)
+				go mainDownload(args[i], cmd)
 			}
 
-			// ダウンロード処理
-			userpath := NewUserPath()
-			downloader := NewDownloader(userpath, url)
-			err = downloader.download()
-			if err != nil {
-				cmd.Println("Download Error!!!", err)
-			}
-
-			// 解凍処理
-			destDir, err := NewFilePath(filepath.Dir(downloader.destPath.String()))
-			if err != nil {
-				cmd.Println("Dest Directory Error!!!", err)
-			}
-
-			var archiver Archiver = NewZipArchiver(downloader.destPath, destDir)
-
-			if err := archiver.extract(); err != nil {
-				cmd.Println("Decompress Error!!!", err)
-			} else {
-				fmt.Println("Complete!!!")
-			}
+			wg.Wait()
+			cmd.Print("Done !!!!!!!")
 		} else {
-			cmd.Println("No input URL!!!") // stderrに出る
+			cmd.PrintErrln("No input URL!!!") // stderrに出る
 		}
 	},
+}
+
+func mainDownload(newurl string, cmd *cobra.Command) {
+	url, err := NewURL(newurl)
+	defer wg.Done()
+
+	if err != nil {
+		cmd.PrintErrln("Invalid URL!!!", err)
+	}
+
+	// ダウンロード処理
+	userpath := NewUserPath()
+	downloader := NewDownloader(userpath, url)
+	err = downloader.download()
+	if err != nil {
+		cmd.PrintErrln("Download Error!!!", err)
+	}
+
+	// 解凍処理
+	destDir, err := NewFilePath(filepath.Dir(downloader.destPath.String()))
+	if err != nil {
+		cmd.PrintErrln("Dest Directory Error!!!", err)
+	}
+
+	var archiver Archiver = NewZipArchiver(downloader.destPath, destDir)
+
+	if err := archiver.extract(); err != nil {
+		cmd.PrintErrln("Decompress Error!!!", err)
+	} else {
+		fmt.Println("Complete!!!")
+	}
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
